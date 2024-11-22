@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h> 
 #include <pthread.h>
+#include <semaphore.h>
 
 
 
@@ -29,11 +30,12 @@ ASM
 void *thread(void *vargp);
 
 volatile long cnt = 0;
-
+pthread_mutex_t mutex;
 
 int main(int argc, char **argv){
     long niters;
     pthread_t tid1, tid2;
+    pthread_mutex_init(&mutex, NULL);
 
     if(argc!=2){
         printf("usage : %s <niters>\n", argv[0]);
@@ -58,8 +60,10 @@ int main(int argc, char **argv){
 void *thread(void *vargp){
     long i, niters = *((long *)vargp);
     
-    for(i=0;i<niters;i++)
+    for(i=0;i<niters;i++){
+        pthread_mutex_lock(&mutex);
         cnt++;
-    
+       pthread_mutex_unlock(&mutex);
+    }
     return NULL;
 }
